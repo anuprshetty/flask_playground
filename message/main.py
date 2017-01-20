@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, redirect, url_for
 from flask_restx import Api, Resource
 
 
@@ -7,6 +7,34 @@ from flask_restx import Api, Resource
 api = Api()
 app = Flask(__name__)
 api.init_app(app)
+
+# route() decorator in Flask is used to bind URL to a function.
+@app.route("/hello/<username>/<int:age>/")
+def hello_world(username, age):
+    return "Hello {}! Your age is {}".format(username, age)
+
+
+# /flask != /flask/
+@app.route("/flask")
+def flask_app():
+    return "Flask app"
+
+
+# /python = /python/
+@app.route("/python/")
+def python_app():
+    return "Python app"
+
+
+@app.route("/app/<name>/")
+def my_app(name):
+    if name == "python":
+        return redirect(url_for("python_app"))
+    elif name == "flask":
+        return redirect(url_for("flask_app"))
+    else:
+        return "Invalid app"
+
 
 @api.route("/welcome/", methods=["GET"])
 class Home(Resource):

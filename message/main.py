@@ -1,5 +1,7 @@
 from flask import Flask, redirect, url_for
 from flask_restx import Api, Resource
+import os
+from flask_swagger_ui import get_swaggerui_blueprint
 
 
 # app --> Web Server Gateway Interface (WSGI) application.
@@ -7,6 +9,15 @@ from flask_restx import Api, Resource
 api = Api()
 app = Flask(__name__)
 api.init_app(app)
+
+basedir = os.path.abspath(os.path.dirname(__file__))
+
+SWAGGER_URL = "/swagger/"
+API_URL = "/static/swagger.json"
+swaggerui_blueprint = get_swaggerui_blueprint(
+    SWAGGER_URL, API_URL, config={"app_name": "Flask-Playground"}
+)
+app.register_blueprint(swaggerui_blueprint, url_prefix=SWAGGER_URL)
 
 # route() decorator in Flask is used to bind URL to a function.
 @app.route("/hello/<username>/<int:age>/")

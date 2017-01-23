@@ -1,5 +1,7 @@
 from flask import Flask, redirect, url_for
 from flask_restx import Api, Resource
+from flask_sqlalchemy import SQLAlchemy
+from flask_marshmallow import Marshmallow
 import os
 from flask_swagger_ui import get_swaggerui_blueprint
 
@@ -18,6 +20,20 @@ swaggerui_blueprint = get_swaggerui_blueprint(
     SWAGGER_URL, API_URL, config={"app_name": "Flask-Playground"}
 )
 app.register_blueprint(swaggerui_blueprint, url_prefix=SWAGGER_URL)
+
+# Database
+app.config["SQLALCHEMY_DATABASE_URI"] = r"sqlite:///" + os.path.join(
+    basedir, "db.sqlite"
+)
+print(app.config["SQLALCHEMY_DATABASE_URI"])
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
+# Initialize SQL ORM (Object Relational Mapper)
+sql_orm = SQLAlchemy(app)
+
+# Initialize Marshmallow
+marshmallow = Marshmallow(app)
+
 
 # route() decorator in Flask is used to bind URL to a function.
 @app.route("/hello/<username>/<int:age>/")

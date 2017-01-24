@@ -1,4 +1,4 @@
-from flask import Flask, redirect, url_for
+from flask import Flask, redirect, url_for, request, jsonify
 from flask_restx import Api, Resource
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
@@ -34,6 +34,34 @@ sql_orm = SQLAlchemy(app)
 # Initialize Marshmallow
 marshmallow = Marshmallow(app)
 
+
+# Product class/model
+class Product(sql_orm.Model):
+    id = sql_orm.Column(sql_orm.Integer, primary_key=True)
+    name = sql_orm.Column(sql_orm.String(100), unique=True)
+    description = sql_orm.Column(sql_orm.String(200))
+    price = sql_orm.Column(sql_orm.Float)
+    quantity = sql_orm.Column(sql_orm.Integer)
+
+    def __init__(self, name, description, price, quantity):
+        self.name = name
+        self.description = description
+        self.price = price
+        self.quantity = quantity
+
+
+# Product Schema
+class ProductSchema(marshmallow.Schema):
+    class Meta:
+        fields = ("id", "name", "description", "price", "quantity")
+
+
+# Initialize schema
+product_schema = ProductSchema()
+products_schema = ProductSchema(many=True)
+
+# Create the database
+sql_orm.create_all()
 
 # route() decorator in Flask is used to bind URL to a function.
 @app.route("/hello/<username>/<int:age>/")

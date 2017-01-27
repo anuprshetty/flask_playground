@@ -63,6 +63,68 @@ products_schema = ProductSchema(many=True)
 # Create the database
 sql_orm.create_all()
 
+
+# Create a product
+@app.route("/products/", methods=["POST"])
+def add_product():
+    name = request.json["name"]
+    description = request.json["description"]
+    price = request.json["price"]
+    quantity = request.json["quantity"]
+
+    new_product = Product(name, description, price, quantity)
+
+    sql_orm.session.add(new_product)
+    sql_orm.session.commit()
+
+    return product_schema.jsonify(new_product)
+
+
+# Get all products
+@app.route("/products/", methods=["GET"])
+def get_products():
+    all_products = Product.query.all()
+    result = products_schema.dump(all_products)
+    return jsonify(result)
+
+
+# Get a particular product
+@app.route("/products/<id>/", methods=["GET"])
+def get_product(id):
+    product = Product.query.get(id)
+    return product_schema.jsonify(product)
+
+
+# Update a particular product
+@app.route("/products/<id>/", methods=["PUT"])
+def update_product(id):
+    product = Product.query.get(id)
+
+    name = request.json["name"]
+    description = request.json["description"]
+    price = request.json["price"]
+    quantity = request.json["quantity"]
+
+    product.name = name
+    product.description = description
+    product.price = price
+    product.quantity = quantity
+
+    sql_orm.session.commit()
+
+    return product_schema.jsonify(product)
+
+
+# Delete a product
+@app.route("/products/<id>/", methods=["DELETE"])
+def delete_product(id):
+    product = Product.query.get(id)
+    sql_orm.session.delete(product)
+    sql_orm.session.commit()
+
+    return product_schema.jsonify(product)
+
+
 # route() decorator in Flask is used to bind URL to a function.
 @app.route("/hello/<username>/<int:age>/")
 def hello_world(username, age):
